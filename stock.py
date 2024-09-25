@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 from prophet import Prophet
-
+import plotly.graph_objs as go
 
 st.title('stock data')
 
