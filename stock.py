@@ -21,7 +21,10 @@ if st.button('get data'):
         st.write(f"{ticker_symbol} stock data")
         st.write(ticker_df)
 
-        st.line_chart(ticker_df['Close'])
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=ticker_df.index, y=ticker_df['Close'], mode='lines', name='Close Price'))
+        fig.update_layout(title=f"{ticker_symbol} Close Price Time Series", xaxis_title="Date", yaxis_title="Close Price")
+        st.plotly_chart(fig)
 
         st.write(f"{ticker_symbol} future prediction")
 
@@ -36,5 +39,13 @@ if st.button('get data'):
         forecast = model.predict(future)
 
         st.write(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']])
+        
+        fig_forecast = go.Figure()
+        fig_forecast.add_trace(go.Scatter(x=forecast['ds'], y=forecast['yhat'], mode='lines', name='Predicted'))
+        fig_forecast.add_trace(go.Scatter(x=forecast['ds'], y=forecast['yhat_lower'], mode='lines', fill='tonexty', name='Lower Bound'))
+        fig_forecast.add_trace(go.Scatter(x=forecast['ds'], y=forecast['yhat_upper'], mode='lines', fill='tonexty', name='Upper Bound'))
+
+        fig_forecast.update_layout(title=f"{ticker_symbol} Future Price Prediction", xaxis_title="Date", yaxis_title="Predicted Price")
+        st.plotly_chart(fig_forecast)        
 else:
     st.info("Please enter the ticker symbol and click the Get Data button")
