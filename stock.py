@@ -11,6 +11,10 @@ ticker_symbol = st.text_input("stock", "AAPL")
 start_date = st.date_input("choose start data", pd.to_datetime('2024-01-01'))
 end_date = st.date_input("choose end data", pd.to_datetime('today'))
 
+changepoint_prior_scale = st.slider("Changepoint Prior Scale (default 0.05)", 0.001, 0.5, 0.05)
+seasonality_mode = st.selectbox("Seasonality Mode", ["additive", "multiplicative"])
+seasonality_prior_scale = st.slider("Seasonality Prior Scale (default 10.0)", 1.0, 50.0, 10.0)
+
 if st.button('get data'):
     ticker_data = yf.Ticker(ticker_symbol)
     ticker_df = ticker_data.history(period='1d', start=start_date, end=end_date)
@@ -32,7 +36,11 @@ if st.button('get data'):
         df_prophet.columns = ['ds', 'y']  
         df_prophet['ds'] = pd.to_datetime(df_prophet['ds']).dt.tz_localize(None)  
 
-        model = Prophet()
+        model = Prophet(
+            changepoint_prior_scale=changepoint_prior_scale,
+            seasonality_mode=seasonality_mode,
+            seasonality_prior_scale=seasonality_prior_scale
+        )
         model.fit(df_prophet)
 
         future = model.make_future_dataframe(periods=365)
